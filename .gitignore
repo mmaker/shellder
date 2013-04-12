@@ -1,2 +1,4 @@
 *.o
 shellder
+doc/html
+doc/latex
