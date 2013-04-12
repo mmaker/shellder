@@ -3,7 +3,7 @@ CFLAGS:=$(CFLAGS) -ansi -Wall -fstack-protector
 EXECUTABLE=shellder
 
 
-SOURCES=shell.c
+SOURCES=shell.c utils.c
 OBJECTS=$(SOURCES: .c=.o)
 
 

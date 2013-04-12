@@ -2,15 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <assert.h>
 
 #include "shell.h"
-
-
-static const char* PS1 = ">>> ";
-static FILE* logfile;
-
-void strip(char**, size_t*);
+#include "process.h"
+#include "utils.h"
 
 
 int main(int argc, char** argv)
@@ -32,40 +28,23 @@ int main(int argc, char** argv)
 }
 
 
-/**
- * Removes trailing and leading whitespaces from a string.
- */
-void strip(char **s, size_t* n)
-{
-    char *tmp;
-
-    /* leading whitespaces */
-    for (; isspace(**s); (*n)--)
-        (*s)++;
-    /* trailing whitespaces */
-    for (tmp = *s + *n-1; isspace(*tmp); (*n)--)
-        tmp--;
-
-   (*s)[*n++] = '\0';
-}
-
-
-
-/**
- * Main loop for the shell.
- */
 void main_shellder(char* slogfile)
 {
    size_t n=1;
    int end=0;
    char* cmd = malloc(sizeof(char));
+
+   assert (!logfile);
    logfile = fopen(slogfile, "w");
 
    while (!end) {
       printf(PS1);
       /*acquire the string */
       getline(&cmd, &n, stdin);
+
       strip(&cmd, &n);
+      split(cmd);
+
 
       /* log. XXX. remove flushing? */
       fprintf(logfile, "$ %s", cmd);
@@ -82,9 +61,6 @@ void main_shellder(char* slogfile)
 }
 
 
-/**
- * Prints out an help for each command line argument, then exit.
- */
 void print_help(char* exe, int returncode)
 {
     switch (returncode) {
