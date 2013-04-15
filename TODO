@@ -1,4 +1,5 @@
 * implement split() function in utils.c
+* write down possible options from command-line and document on --help
 * see manpage 3 for dup, exec and discriminate for necessary informations for a
   proc_t structure, then declare it to process.h
 * implement a wrapper around fprintf using snprintf over stdout, and replace
