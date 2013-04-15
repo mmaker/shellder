@@ -11,3 +11,10 @@ typedef struct {
 } proc_t;
 
 
+/**
+ * \brief Executes the given command, forking the process and then substituing
+ *        its memory space.
+ * \param cmd The command to be executed.
+ *
+ */
+int run(char* cmd);

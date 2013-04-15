@@ -6,16 +6,8 @@
  */
 
 
-FILE* logfile = NULL;
 char** environ;
-const char* PS1 = ">>> ";
-
-
-/**
- * \brief Prints out an help for each command line argument, then exit.
- *
- */
-void print_help(char* exe, int returncode);
+char* PS1 = ">>> ";
 
 
 /**
@@ -25,6 +17,6 @@ void print_help(char* exe, int returncode);
  *                  be updated accordingly
  *
  */
-void main_shellder(char* slogfile);
+void main_shellder();
 
 
