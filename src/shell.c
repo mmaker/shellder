@@ -68,7 +68,6 @@ void main_shellder()
 {
     char* line;
     int logfno;
-    int buf;
 
     assert (*logf);
     /*
@@ -79,23 +78,20 @@ void main_shellder()
     }
     XXX. check stat file for writable, not directory.
     */
-    logfno = open(logf, O_DIRECT | O_CREAT | O_WRONLY | O_TRUNC, 0644);
-    buf = dup(1);
-    dup2(logfno, 1);
-    dup2(buf, 1);
-
+    logfno = open(logf, O_DIRECT|O_CREAT|O_WRONLY|O_TRUNC, 0644);
 
     while ((line = readline(PS1)) != 0) {
         if (!*line) continue;
 
         printf("[%s] on proc %d\n", line, 0);
-        /* all happens here */
+        run(line);
         add_history(line);
         free(line);
     }
     fprintf(stdout, "\nexit\n");
 
     fflush(stdout);
+    close(logfno);
     exit(EXIT_SUCCESS);
 }
 
