@@ -21,6 +21,8 @@
 extern int errno;
 extern char* optarg;
 extern char* PS1;
+extern char* program_invocation_name;
+extern char* program_invocation_short_name;
 
 char* logf = "shellder.log";
 
@@ -29,22 +31,22 @@ char* logf = "shellder.log";
  * \brief Prints out an help for each command line argument, then exit.
  *
  */
-static void usage(char* progname)
+static void usage()
 {
-    fprintf(stderr, "%s usage: %s [-l logffile] [-p prompt]\n", progname, progname);
+    fprintf(stderr, "%s usage: %s [-l logffile] [-p prompt]\n",
+            program_invocation_short_name, program_invocation_name);
 }
 
 
 int main(int argc, char** argv)
 {
-    char* progname = argv[0];
     char opt;
     extern char* logf;
 
     while ((opt = getopt(argc, argv, "l:h:p")) != EOF)
         switch (opt) {
             case 'h':
-                usage(progname);
+                usage();
                 exit(EXIT_SUCCESS);
             case 'l':
                 logf = optarg;
@@ -53,7 +55,7 @@ int main(int argc, char** argv)
                 PS1 = optarg;
                 break;
             default:
-                usage(progname);
+                usage();
                 exit(EXIT_FAILURE);
     }
     main_shellder();
