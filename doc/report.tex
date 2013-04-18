@@ -1,7 +1,6 @@
 \documentclass[11pt]{article}
 \title{\textbf{Sistemi Operativi 1}}
-\author{Giulio Michelon, Matteo Lever, Michele Orr\`u\\
-}
+\author{Giulio Michelon, Matteo Lever, Michele Orr\`u}
 \date{}
 \begin{document}
 
@@ -9,7 +8,36 @@
 
 \section{Introduzione}
 
-\textbf{Shellder} \`e il progetto che abbiamo scelto per passare con onore l'esame di sistemi operativi uno. Speriamo che crispo sia abbastanza appagato dal vedere che questo report \`e stato scritto in
- \LaTeX .
+\textbf{Shellder} \`e una \emph{shell interattiva} con \emph{scheduling prioritario}.
+Ogni comando digitato dall'utente viene posto in una coda prioritaria ed eseguito in background nella shell di
+default \texttt{/bin/sh}. Questo vuol dire che ogni comando scritto sul \emph{Shellder} \`e equivalente ad un
+comando sulla shell standard: variabili d'ambiente come \texttt{\$PATH} avranno lo stesso significato;
+con il vantaggio di poter eseguire i vari processi un background e di poterli gestire attraverso uno 
+\emph{scheduler spaziotemporale}.
+L'output di questi processi, insieme ai log della shell interattiva, vengono salvati all'interno di un file 
+\texttt{shellder.log}, se non diversamente indicato.
+
+\section{Albero delle directory}
+
+L'intero progetto pu\`o essere scaricato in qualsiasi momento da GitHub[0].
+\texttt{git clone https://github.com/mmaker/shellder.git}
+
+La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto C: la root del sorgente si chiama \texttt{shellder/}, e all'interno di essa \`e possibile trovare i file \texttt{LICENSE}, \texttt{README}.
+
+
+\section{Scelte Implementative}
+
+\paragraph{Ordinamento dei Processi\\}
+L'algoritmo dedito allo scheduling segue palesemente una coda prioritaria;
+le possibilit\`a di implementazione di quest'ultimo sono numerosissime e
+spaziano dal vettore statico alle librerie esterne di ricerca scientifica.
+
+Per esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
+parti non inclusi nella libreria standard c; dopo aver valutato mediante analisi
+dei costi, abbiamo optato per una struttura della forma linked tree piuttosto
+che un vettore statico, difatti costi di inserimento e rimozione risultano
+ordini di grandezza minori nel caso dell'albero linkato:
+
+
 
 \end{document}
