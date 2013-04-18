@@ -1,11 +1,10 @@
 CC=gcc
-CFLAGS:=$(CFLAGS) -ansi -Wall -fstack-protector -lreadline -ggdb
+CFLAGS:=$(CFLAGS) -ansi -std=c99 -Wall -fstack-protector -lreadline -ggdb
 EXECUTABLE=shellder
 
 
-SOURCES=shell.c utils.c process.c
+SOURCES=shell.c utils.c process.c dbg.c
 OBJECTS=$(SOURCES: .c=.o)
-
 
 %.o:  %.c
 	$(CC) $(CFLAGS) -c $@

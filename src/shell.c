@@ -16,6 +16,8 @@
 #include "shell.h"
 #include "process.h"
 #include "utils.h"
+#include "dbg.h"
+#include "locale.h"
 
 
 extern int errno;
@@ -24,7 +26,7 @@ extern char* PS1;
 extern char* program_invocation_name;
 extern char* program_invocation_short_name;
 
-char* logf = "shellder.log";
+char* slogf = "shellder.log";
 
 
 /**
@@ -33,15 +35,40 @@ char* logf = "shellder.log";
  */
 static void usage()
 {
-    fprintf(stderr, "%s usage: %s [-l logffile] [-p prompt]\n",
+    fprintf(stderr, "%s usage: %s [-l slogfile] [-p prompt]\n",
             program_invocation_short_name, program_invocation_name);
 }
+
+/**
+ * \brief process a debug command.
+ *
+ */
+void process_dbg(char *line) {
+    struct dbgf_t const * it;
+
+    for (it = dbgop; it->name; it++)
+        if (!strcmp(line, it->name)) {
+             (*(it->funct))(0, NULL);
+             return;
+        }
+    fprintf(stderr, "shellder: command not found.\n");
+}
+
+/**
+ * \brief executes a command.
+ */
+void process_cmd(char *line) {
+    printf("[%s on proc %d]\n", line, 0);
+    run(line);
+}
+
 
 
 int main(int argc, char** argv)
 {
     char opt;
-    extern char* logf;
+    extern char* slogf;
+    setlocale(LC_ALL, "");
 
     while ((opt = getopt(argc, argv, "l:h:p")) != EOF)
         switch (opt) {
@@ -49,7 +76,7 @@ int main(int argc, char** argv)
                 usage();
                 exit(EXIT_SUCCESS);
             case 'l':
-                logf = optarg;
+                slogf = optarg;
                 break;
             case 'p':
                 PS1 = optarg;
@@ -66,33 +93,32 @@ int main(int argc, char** argv)
 
 void main_shellder()
 {
-    char* line;
-    int logfno;
+    char* line = NULL;
+    int slogfno;
 
-    assert (*logf);
+    assert (*slogf);
     /*
     struct stat sb;
-    if (stat(logf, &sb) < 0) {
-        fprintf(stderr, "Error: bad file descriptor: %s\n", logf);
+    if (stat(slogf, &sb) < 0) {
+        fprintf(stderr, "Error: bad file descriptor: %s\n", slogf);
         exit(errno);
     }
     XXX. check stat file for writable, not directory.
     */
-    logfno = open(logf, O_DIRECT|O_CREAT|O_WRONLY|O_TRUNC, 0644);
+    slogfno = open(slogf, O_DIRECT|O_CREAT|O_WRONLY|O_TRUNC, 0644);
 
     while ((line = readline(PS1)) != 0) {
-        if (!*line) continue;
+        /* possible leak when pressing return. XXX */
+        if (!*line)                 continue;
+        else if (line[0] == '%')    process_dbg(line+1);
+        else                        process_cmd(line);
 
-        printf("[%s] on proc %d\n", line, 0);
-        run(line);
         add_history(line);
         free(line);
     }
-    fprintf(stdout, "\nexit\n");
+    fprintf(stdout, "exit\n");
 
     fflush(stdout);
-    close(logfno);
+    close(slogfno);
     exit(EXIT_SUCCESS);
 }
-
-
