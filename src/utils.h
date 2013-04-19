@@ -6,8 +6,6 @@
  */
 
 
-
-
 /**
  * \brief Removes trailing and leading whitespaces from a string.
  * \param s the string to be stripped,

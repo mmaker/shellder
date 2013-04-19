@@ -6,19 +6,29 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <error.h>
 
 #include "process.h"
+
+#define EXIT_ENOMEM()   \
+        error_at_line(1, ENOMEM, __FILE__, __LINE__, NULL);
 
 proc_t* ps = NULL;
 proc_t** lst = &ps;
 static const int lenpn = 10;
+static const int BUF = 256;
 
 proc_t* add_proc(char* cmd) {
 
     proc_t *p;
-    char* name = malloc(sizeof(char) * lenpn );
+    char* name;
+
+    name = malloc(sizeof(char) * lenpn );
+    if (!name) EXIT_ENOMEM();
 
     p = malloc(sizeof(proc_t));
+    if (!p) EXIT_ENOMEM();
+
     p->next = NULL;
     p->prev = *lst;
     p->name = name;
@@ -58,10 +68,13 @@ proc_t* del_procp(proc_t* p) {
 int run(char* cmd)
 {
     proc_t* p;
-    char* buf = malloc(sizeof(char) * 1024);
+    char* buf;
+
+    buf = malloc(sizeof(char) * BUF);
+    if (!buf) EXIT_ENOMEM();
 
     p = add_proc(cmd);
-    while (fread(buf, sizeof(char), 1024, p->out))
+    while (fread(buf, sizeof(char), BUF, p->out))
         fprintf(stdout, buf);
 
     wait(NULL);
