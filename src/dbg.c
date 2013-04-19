@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <wchar.h>
 
+#include "process.h"
+
+extern proc_t* ps;
+
 
 int pd(int argc, char** argv)
 {
@@ -22,6 +26,10 @@ int pd(int argc, char** argv)
 
 int processes(int argc, char** argv)
 {
-    /* XXX. not implemented */
+    proc_t* it;
+
+    for (it = ps; it != NULL; it = it->next)
+        printf("%s, ", it->name);
+    printf("\b\n");
     return 0;
 }

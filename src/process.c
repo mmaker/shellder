@@ -44,6 +44,11 @@ proc_t* del_procp(proc_t* p) {
    if (p->prev)
        p->prev->next = p->next;
 
+   if (p == ps)
+       ps = p->next;
+   if (p == *lst)
+       lst = &p->prev;
+
    free(p->name);
    free(p);
    return ps;
