@@ -1,4 +1,6 @@
 *.o
 shellder
+libshellder.a
+
 doc/html
 doc/latex

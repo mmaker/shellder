@@ -1,6 +1,6 @@
 include Makefile.in
 
-$(EXE): libshellder.a
+$(EXE): libshellder.a $(addprefix src/, $(OBJS))
 	$(CC) -o $(EXE) libshellder.a $(LIBS)
 
 libshellder.a:
@@ -14,6 +14,6 @@ all: $(EXE)
 
 clean:
 	find src -name '*.[oa]' -delete
-	rm -f --  $(OBJS) $(EXE)
+	rm -f --  $(OBJS) $(EXE) libshellder.a
 
 
