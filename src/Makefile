@@ -1,23 +1,15 @@
-CC=gcc
-CFLAGS:=$(CFLAGS) -ansi -std=c99 -Wall -fstack-protector -lreadline -ggdb
-EXECUTABLE=shellder
+include ../Makefile.in
 
-
-SOURCES=shell.c utils.c process.c dbg.c
-OBJECTS=$(SOURCES: .c=.o)
+OBJS=shell.o utils.o process.o dbg.o
 
 %.o:  %.c
-	$(CC) $(CFLAGS) -c $@
+	$(ECHO) $(CC) $(CFLAGS) $+
+	$(CC) $(CFLAGS) $+
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $@
+../libshellder.a: $(OBJS)
+	$(AR) $(ARFLAGS) ../libshellder.a shell.o utils.o process.o dbg.o
+	$(RANLIB) ../libshellder.a
 
-all: $(SOURCES) $(EXECUTABLE)
 
-.PHONY:	clean
-
-clean:
-	find -name '*.o' -delete
-	find -executable -delete
 
 
