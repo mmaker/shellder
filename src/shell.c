@@ -18,6 +18,7 @@
 #include "utils.h"
 #include "dbg.h"
 #include "locale.h"
+#include "scheduler.h"
 
 
 extern int errno;
@@ -96,6 +97,7 @@ void main_shellder()
     char* line = NULL;
     int slogfno;
 
+    start_scheduler();
     assert (*slogf);
     /*
     struct stat sb;
@@ -120,5 +122,6 @@ void main_shellder()
 
     fflush(stdout);
     close(slogfno);
+    stop_scheduler();
     exit(EXIT_SUCCESS);
 }
