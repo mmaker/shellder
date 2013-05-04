@@ -1,3 +1,5 @@
+#ifndef __PROCESS_H__
+#define __PROCESS_H__
 /**
  * \file process.h
  * \brief Structures and operations over processses.
@@ -47,3 +49,5 @@ uint8_t palive(const proc_t *);
  *
  */
 int run(char* cmd);
+
+#endif

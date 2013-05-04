@@ -1,3 +1,6 @@
+#ifndef __SCHEDULER_H__
+#define __SCHEDULER_H__
+
 /**
  * \file scheduler.h
  * \brief thread for scheduling and managinf processes.
@@ -17,3 +20,5 @@ void start_scheduler();
 void stop_scheduler();
 proc_t* pspop();
 void psinsert(proc_t* node);
+
+#endif

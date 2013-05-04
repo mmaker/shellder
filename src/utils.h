@@ -1,3 +1,5 @@
+#ifndef __UTILS__H__
+#define __UTILS__H__
 /**
  * \file utils.h
  * \brief Various string/array utilities.
@@ -28,3 +30,4 @@ void strip(char** s, size_t* n);
  */
 char* split(char* s);
 
+#endif
