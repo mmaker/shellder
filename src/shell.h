@@ -6,8 +6,7 @@
  */
 
 
-char** environ;
-char* PS1 = ">>> ";
+extern char* PS1;
 
 
 /**

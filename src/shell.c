@@ -20,13 +20,7 @@
 #include "locale.h"
 #include "scheduler.h"
 
-
-extern int errno;
-extern char* optarg;
-extern char* PS1;
-extern char* program_invocation_name;
-extern char* program_invocation_short_name;
-
+char* PS1 = ">>> ";
 char* slogf = "shellder.log";
 
 
