@@ -1,6 +1,7 @@
 include Makefile.in
 
-$(EXE): libshellder.a $(addprefix src/, $(OBJS))
+$(EXE): $(addprefix src/, $(OBJS)) libshellder.a
+	cd src; $(MAKE) $(MFLAGS)
 	$(CC) -o $(EXE) libshellder.a $(LIBS)
 
 libshellder.a:
