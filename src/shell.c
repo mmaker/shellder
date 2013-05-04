@@ -59,11 +59,11 @@ void process_dbg(char *line) {
  * \brief executes a command.
  */
 void process_cmd(char *line) {
-    printf("[%s on proc %d]\n", line, 0);
-    run(line);
+    proc_t* p = pnew(line);
+    pstop(p);
+    psinsert(p);
+    printf("[%s on proc %d]\n", p->name, p->pid);
 }
-
-
 
 int main(int argc, char** argv)
 {
@@ -95,19 +95,7 @@ int main(int argc, char** argv)
 void main_shellder()
 {
     char* line = NULL;
-    int slogfno;
-
     start_scheduler();
-    assert (*slogf);
-    /*
-    struct stat sb;
-    if (stat(slogf, &sb) < 0) {
-        fprintf(stderr, "Error: bad file descriptor: %s\n", slogf);
-        exit(errno);
-    }
-    XXX. check stat file for writable, not directory.
-    */
-    slogfno = open(slogf, O_DIRECT|O_CREAT|O_WRONLY|O_TRUNC, 0644);
 
     while ((line = readline(PS1)) != 0) {
         /* possible leak when pressing return. XXX */
@@ -120,8 +108,9 @@ void main_shellder()
     }
     fprintf(stdout, "exit\n");
 
-    fflush(stdout);
-    close(slogfno);
     stop_scheduler();
+    /* streams are flushed automagically here:
+     * https://www.gnu.org/software/libc/manual/html_node/Flushing-Buffers.html
+     */
     exit(EXIT_SUCCESS);
 }

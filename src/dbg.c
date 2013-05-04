@@ -2,9 +2,7 @@
 #include <wchar.h>
 
 #include "process.h"
-
-extern proc_t* ps;
-
+#include "scheduler.h"
 
 int pd(int argc, char** argv)
 {
@@ -26,10 +24,10 @@ int pd(int argc, char** argv)
 
 int processes(int argc, char** argv)
 {
-    proc_t* it;
+    size_t i;
 
-    for (it = ps; it != NULL; it = it->next)
-        printf("%s, ", it->name);
+    for (i = 0; i != psize; i++)
+        printf("%s, ", ps[i]->name);
     printf("\b\n");
     return 0;
 }

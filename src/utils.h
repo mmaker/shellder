@@ -5,6 +5,11 @@
  *
  */
 
+#define EXIT_ENOMEM()   \
+        error_at_line(1, ENOMEM, __FILE__, __LINE__, NULL)
+#define EXIT_ERRNO()    \
+        error_at_line(1, errno, __FILE__, __LINE__, NULL)
+
 
 /**
  * \brief Removes trailing and leading whitespaces from a string.

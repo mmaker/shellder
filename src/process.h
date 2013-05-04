@@ -5,22 +5,16 @@
  * \detail This file holds the base struct proc_t and declares the basics fucntions to
  *         interact with it.
  */
+#include <stdint.h>
+#include <sys/types.h>
 
 
 typedef struct proc_t {
-    struct proc_t* next;     /* pointer to the next process in chain */
-    struct proc_t* prev;     /* pointer to the previous process in chain */
-
-    int pid;                 /* pid associated with the child. 0 if unknown. */
+    pid_t pid;                 /* pid associated with the child. 0 if unknown. */
+    float priority;          /* the priority of the current process. */
     char* name;              /* a human-readable string identifying the process. */
-    FILE* out;               /* file descriptor for the stdout of the child process. */
+    int outfno;             /* file descriptor for the stdout of the child process. */
 } proc_t;
-
-
-/* root of the chain. NULL if no process. is on queue. */
-extern proc_t* ps;
-/* reference to the next element of the last process in queue. */
-extern proc_t** lst;
 
 
 /*
@@ -28,7 +22,7 @@ extern proc_t** lst;
  * \param cmd the command to be executed.
  * \return a new proc_t structure generated from `cmd`.
  */
-proc_t* add_proc(char* cmd);
+proc_t* pnew(const char* cmd);
 
 /*
  *  \brief remove a process from the chain of active processes.
@@ -37,14 +31,12 @@ proc_t* add_proc(char* cmd);
  *  \param pattern pattern.
  *  \return 0 if the chain is empty, its root otherwise.
  */
-proc_t* del_procc(char* pattern);
+void pdel(proc_t* p);
 
-/*
- *  \brief remove a process from the chain of active processes.
- *  \param p the process to be removed.
- *  \return 0 if the chain is empty, its root otherwise.
- */
-proc_t* del_procp(proc_t* p);
+void pstop(proc_t* p);
+void pcont(proc_t* p);
+void plog(const proc_t *);
+uint8_t palive(const proc_t *);
 
 
 /*
