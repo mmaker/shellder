@@ -40,13 +40,25 @@ static void usage()
  */
 void process_dbg(char *line) {
     struct dbgf_t const * it;
+    int ret;
+
+    char** argv = (char**) calloc(8, sizeof(char*));
+    size_t argc;
+
+    argv[0] = strtok(line, " ");
+    for (argc=1; argc!=8; argc++)
+        if (!(argv[argc] = strtok(NULL, " "))) break;
 
     for (it = dbgop; it->name; it++)
         if (!strcmp(line, it->name)) {
-             (*(it->funct))(0, NULL);
-             return;
+             ret = (*(it->funct))(argc, argv);
+             if (ret) fprintf(stderr, "!%d\n", ret);
+             goto quit;
         }
     fprintf(stderr, "shellder: command not found.\n");
+quit:
+    free(argv);
+    return;
 }
 
 /**
