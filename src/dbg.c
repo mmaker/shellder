@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <wchar.h>
 
 #include "process.h"
@@ -20,6 +22,22 @@ int pd(int argc, char** argv)
             "sed líbera nos a malo.\n"
             "men.\n");
     return 42;
+}
+
+int set(int argc, char** argv)
+{
+    if (argc != 3) return 1;
+
+    if (!strcmp(argv[1], "a"))
+        _a = atof(argv[2]);
+    else if (!strcmp(argv[1], "b"))
+        _b = atof(argv[2]);
+    else if (!strcmp(argv[1], "t"))
+        _t = atoi(argv[2]);
+    else
+       return 1;
+
+    return 0;
 }
 
 int processes(int argc, char** argv)

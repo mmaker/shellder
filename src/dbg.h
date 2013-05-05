@@ -12,13 +12,16 @@ int pd(int argc, char** argv);
  */
 int processes(int argc, char** argv);
 
+int set(int argc, char** argv);
+
 const struct dbgf_t  {
     const char* name;
     int (*funct) (int argc, char** argv);
 } dbgop[] = {
-    {.name="ps", .funct=processes},
-    {.name="pd", .funct=pd},
-    {.name=NULL, .funct=NULL},
+    {.name="ps",  .funct=processes},
+    {.name="pd",  .funct=pd},
+    {.name="set", .funct=set},
+    {.name=NULL,  .funct=NULL},
 };
 
 

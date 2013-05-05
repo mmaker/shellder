@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <assert.h>
 #include <sys/wait.h>
+#include <math.h>
 
 
 #include "process.h"
@@ -19,13 +20,13 @@ proc_t** ps = NULL;
 size_t psize = 0;
 static int HEAPLEN = 10;
 
-struct timespec SCHEDULE_FREQ = {
-    .tv_sec = 1,
-    .tv_nsec = 0,
-};
 
-#define PRIORITY(p)      1
-#define DELAY()          nanosleep(&SCHEDULE_FREQ, NULL);
+unsigned int  _t=1;
+float         _a=1,
+              _b=0;
+
+#define PRIORITY(p)      _a * expf(-_b*_t)
+#define DELAY()          usleep(_t);
 
 
 /*

@@ -30,8 +30,16 @@ char* slogf = "shellder.log";
  */
 static void usage()
 {
-    fprintf(stderr, "%s usage: %s [-l slogfile] [-p prompt]\n",
-            program_invocation_short_name, program_invocation_name);
+    static const char* help =  "%s usage: %s "
+                               "[-l slogfile] "
+                               "[-p prompt] "
+                               "[-A a] "
+                               "[-B b] "
+                               "[-T t] "
+                               "\n";
+    fprintf(stderr, help,
+            program_invocation_short_name,
+            program_invocation_name);
 }
 
 /**
@@ -77,7 +85,7 @@ int main(int argc, char** argv)
     extern char* slogf;
     setlocale(LC_ALL, "");
 
-    while ((opt = getopt(argc, argv, "l:h:p")) != EOF)
+    while ((opt = getopt(argc, argv, "l:h:p:A:B:T")) != EOF)
         switch (opt) {
             case 'h':
                 usage();
@@ -87,6 +95,15 @@ int main(int argc, char** argv)
                 break;
             case 'p':
                 PS1 = optarg;
+                break;
+            case 'A':
+                _a = atof(optarg);
+                break;
+            case 'B':
+                _b = atof(optarg);
+                break;
+            case 'T':
+                _t = atoi(optarg);
                 break;
             default:
                 usage();
