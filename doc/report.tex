@@ -7,6 +7,12 @@
 
 \maketitle
 
+\abstract 
+Lo scopo di questo documento \`e quello di fornire un'inquadratura generale di come \`e stato organizzato il 
+codice, delle difficolt\`a e delle soluzioni algoritmiche adottate. Tutti i dettagli pi\`u strettamente 
+riguardanti l'implementazione sono descritti all'interno della documentazione automaticamente generata 
+tramite Doxygen.
+
 \section{Introduzione}
 
 \textbf{Shellder} \`e una \emph{shell interattiva} con \emph{scheduling prioritario}.
@@ -18,32 +24,68 @@ con il vantaggio di poter eseguire i vari processi un background e di poterli ge
 L'output di questi processi, insieme ai log della shell interattiva, vengono salvati all'interno di un file 
 \texttt{shellder.log}, se non diversamente indicato da command-line.
 
+\section{Utilizzo del software} 
+
+Prima di cominciare, \`e necessario installare gli headers della libreria libreadline, nel caso di debian tramite:
+\\ \texttt{\$ sudo apt-get install libreadline-dev}
+
+\noindent Spostarsi all'interno della root del progetto, quindi compilare il codice con:
+\\ \texttt{\$ make}
+
+\noindent \`E ora possibile eseguire il software: 
+\\ \texttt{\$ ./shellder -h}
+
+\noindent Verr\`a visualizzato l'help del programma, e listate le opzioni mediante le quali e` possibile modificare le costanti usate dallo schedule e cambiare la destinazione del file di log.
+Alcuni esempi di come e` possibile usare la shell potrebbero essere:
+\\ \texttt{\$ ./shellder -T 10000 -B 0 -A 1 -l shellder.log}
+\\ \texttt{>>> ./examples/ping.py uno}
+\\ \texttt{>>> ./examples/ping.py due}
+\\ \texttt{>>> ./examples/ping.py tre}
+\\ \texttt{>>> ./examples/ping.py quattro}
+ 
+\noindent Nella prima riga viene invocata la shell, successivamente vengono chiamati diversi comandi, i quali riempiono la coda di processi, attivano lo scheduler, e scrivono sullo standard output, il quale viene appositamente rediretto sul file di log.
+\\ \texttt{>>> \% ps}
+
+\noindent Il seguente comando di debug mostrer\`a la lista dei processi attualmente in coda.
+
 \section{Albero delle directory}
 
 L'intero progetto pu\`o essere scaricato in qualsiasi momento da GitHub[0].
 \texttt{git clone https://github.com/mmaker/shellder.git}
 
-La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto C: la root del sorgente si chiama \texttt{shellder/}, e all'interno di essa \`e possibile trovare i file \texttt{LICENSE}, \texttt{README}.
+La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto \texttt{C}: la root del sorgente si chiama \texttt{shellder/}, e all'interno di essa \`e possibile trovare i file \texttt{LICENSE}, \texttt{README}.
 
+All'interno della cartella \texttt{src/} si trovano i files: 
+\begin{itemize}
+\item \texttt{shell.[ch]}, che ha il compito di gestire l'interazione con l'utente, la command line, e l'inserimento di nuovi processi nella coda dello scheduler;
+\item \texttt{process.[ch]} nella quale viene definito il tipo \texttt{proc\_t} e le funzioni per interagire con esso;
+\item \texttt{scheduler.[ch]}, nel quale viene definita la coda dei processi, le operazioni da effettuare su essa, e le funzioni di inizializzazione del thread dedicato allo scheduling;
+\item \texttt{utils.[ch]}, nel quale sono implementate diverse operazioni per la manipolazione di stringhe e/o di strutture interne;
+\item \texttt{dbg.[ch]} contiene tutte le funzioni di debug.
+\end{itemize}
+
+Per maggiori informazioni, e` possibile consultare la documentazione automaticamente generata mediante Doxygen.
 
 \section{Scelte Implementative}
 
 \paragraph{Ordinamento dei Processi\\}
 L'algoritmo dedito allo scheduling segue palesemente una coda prioritaria;
-le possibilit\`a di implementazione di quest'ultimo sono numerosissime e
-spaziano dal vettore statico alle librerie esterne di ricerca scientifica.
+Pper esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
+parti, fuori dalla libreria standard, quanto piuttosto implementarne una nostra versione, facendo riferimento all'algoritmo proposto da \emph{Introduction to Algorithms, The MIT Press}. La sua implementazione \`e consultabile all'interno del file \texttt{scheduler.c}.
 
-Per esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
-parti non inclusi nella libreria standard c; dopo aver valutato mediante analisi
-dei costi, abbiamo optato per una struttura della forma linked tree piuttosto
-che un vettore statico, difatti costi di inserimento e rimozione risultano
-ordini di grandezza minori nel caso dell'albero linkato:
+\paragraph{Tool per il debugging\\}
+Al di l\`a dell'ausilio software esterni quali \texttt{gdb} e \texttt{valgrind}, all'interno della shell stessa \`e stato implementato un meccanismo per aiutare nel debugging e per il controllo della correttezza dello scheduler. Infatti, tutti i comandi il cui primo carattere \`e "\texttt{\%}" vengono processati al di fuori dalla coda dei processi, da delle funzioni interne alla shell. \`E possibile listare le funzioni di debug mediante il comando \texttt{\%help}.
+
+Inoltre, per testare lo scheduler, sono disponibili alcuni eseguibili all'interno della cartella \texttt{examples/}: trattasi di piccoli script che interagiscono con lo standard output e che possono essere usati per valutare, dall'esterno, le performance dell'applicazione.
+
 
 \section{Valutazione delle Costanti}
 
 La scelta delle costanti dello scheduler pu\`o risultare intuitiva se si adnalizzano i casi limite: 
 \begin{itemize}
-\item $if \ \ \ b \rightarrow 0 , \forall a \ \ \ f(t) = a$. In questo caso si ha uno scheduler di tipo round-robin: a tutti i processi vengono infatti assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione.  
+\item $if \ \ \ b \rightarrow 0 , \forall a \ \ \ f(t) = a$. In questo caso si ha uno scheduler di tipo round-robin: a tutti i processi vengono infatti assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione.
+
+\item $if \ \ \ b = 0, a $   
 \end{itemize}
 
 
