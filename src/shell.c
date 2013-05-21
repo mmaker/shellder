@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <syslog.h>
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -21,7 +22,9 @@
 #include "scheduler.h"
 
 char* PS1 = ">>> ";
-char* slogf = "shellder.log";
+int log_options = LOG_CONS | LOG_NOWAIT;
+
+char* shell_out_fname = "shellder.log";
 
 
 /**
@@ -118,7 +121,10 @@ int main(int argc, char** argv)
 void main_shellder()
 {
     char* line = NULL;
+
     start_scheduler();
+    openlog(program_invocation_short_name, log_options, LOG_USER);
+    shell_out = fopen(shell_out_fname, "w");
 
     while ((line = readline(PS1)) != 0) {
         /* possible leak when pressing return. XXX */
@@ -132,6 +138,8 @@ void main_shellder()
     fprintf(stdout, "exit\n");
 
     stop_scheduler();
+    /* optional */
+    closelog();
     /* streams are flushed automagically here:
      * https://www.gnu.org/software/libc/manual/html_node/Flushing-Buffers.html
      */

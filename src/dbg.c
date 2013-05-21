@@ -44,8 +44,16 @@ int processes(int argc, char** argv)
 {
     size_t i;
 
+    if (!psize) {
+        printf("No processes in queue.\n");
+        return 1;
+    }
+
+    printf("Found %u processes in queue: ",
+           (unsigned int) psize);
+
     for (i = 0; i != psize; i++)
         printf("%s, ", ps[i]->name);
-    printf("\b\n");
+    printf("\b\b    \n");
     return 0;
 }

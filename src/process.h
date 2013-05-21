@@ -11,6 +11,9 @@
 #include <sys/types.h>
 
 
+extern FILE* shell_out;
+
+
 typedef struct proc_t {
     pid_t pid;                 /* pid associated with the child. 0 if unknown. */
     float priority;          /* the priority of the current process. */

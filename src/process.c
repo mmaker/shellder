@@ -10,6 +10,9 @@
 #include <error.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include <time.h>
+#include <syslog.h>
+#include <pthread.h>
 
 #include "process.h"
 #include "utils.h"
@@ -18,6 +21,8 @@ extern int errno;
 
 static const int lenpn = 10;
 static const int BUF = 256;
+
+FILE* shell_out;
 
 static pid_t popen2(const char* command, int* outfp)
 {
@@ -42,6 +47,8 @@ static pid_t popen2(const char* command, int* outfp)
         else        *outfp = poutfno[0];
         return pid;
     }
+
+    return 0;
 }
 
 proc_t* pnew(const char* cmd) {
@@ -67,12 +74,14 @@ void pdel(proc_t* p)
 
 void pstop(proc_t* p)
 {
+    // syslog(LOG_NOTICE, "'%s' STOP %d ", p->name, time(NULL));
     if (kill(p->pid, SIGSTOP) != 0)
         error_at_line(1, errno, __FILE__, __LINE__, NULL);
 }
 
 void pcont(proc_t* p)
 {
+    // syslog(LOG_NOTICE, "'%s' CONT %d", p->name, time(NULL));
     if (kill(p->pid, SIGCONT) != 0)
         error_at_line(1, errno, __FILE__, __LINE__, NULL);
 
@@ -86,22 +95,12 @@ uint8_t palive(const proc_t* p)
 
 void plog(const proc_t* p)
 {
-    /*
-    assert (*slogf);
-    struct stat sb;
-    if (stat(slogf, &sb) < 0) {
-        fprintf(stderr, "Error: bad file descriptor: %s\n", slogf);
-        exit(errno);
-    }
-    XXX. check stat file for writable, not directory.
-    slogfno = open(slogf, O_DIRECT|O_CREAT|O_WRONLY|O_TRUNC, 0644);
-    close(slogfno);
-    */
     char* buf = malloc(sizeof(char) * BUF);
     if (!buf) EXIT_ENOMEM();
 
     while (read(p->outfno, buf, BUF) > 0)
-        fprintf(stdout, buf);
+        fprintf(shell_out, buf);
+    fflush(shell_out);
     free(buf);
 }
 

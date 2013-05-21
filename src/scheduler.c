@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <sys/wait.h>
 #include <math.h>
+#include <syslog.h>
 
 
 #include "process.h"
@@ -19,9 +20,9 @@ static pthread_attr_t schedta;
 proc_t** ps = NULL;
 size_t psize = 0;
 static int HEAPLEN = 10;
+pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
 
-
-unsigned int  _t=1;
+unsigned int  _t=10*1000;
 float         _a=1,
               _b=0;
 
@@ -38,7 +39,7 @@ float         _a=1,
 
 #define CLEFT(node)      node << 1
 #define CRIGHT(node)     (node << 1) + 1
-#define PARENT(node)     node / 2
+#define PARENT(node)     node >> 1
 #define PSMAX            ps[0]
 #define PSWAP(fst, snd)  {\
         proc_t* swap = ps[fst];  \
@@ -52,9 +53,12 @@ static void heapify(int i)
         r = CRIGHT(i);
     int largest;
 
-    if (l < psize && ps[l] > ps[i])       largest = l;
-    else                                  largest = i;
-    if (r < psize && ps[r] > ps[largest]) largest = r;
+    if (l < psize && ps[l]->priority >= ps[i]->priority)
+        largest = l;
+    else
+        largest = i;
+    if (r < psize && ps[r]->priority >= ps[largest]->priority)
+        largest = r;
 
     if (largest != i) {
         PSWAP(i, largest);
@@ -78,6 +82,7 @@ proc_t*  pspop()
 void psinsert(proc_t* node)  {
     size_t i;
 
+    pthread_mutex_lock(&qmutex);
     node->priority = PRIORITY(node);
     ps[psize++] = node;
 
@@ -85,6 +90,8 @@ void psinsert(proc_t* node)  {
          i > 0 && i < psize && ps[i]->priority > ps[PARENT(i)]->priority;
          i=PARENT(i))
         PSWAP(i, PARENT(i));
+
+    pthread_mutex_unlock(&qmutex);
 }
 
 
@@ -98,11 +105,17 @@ void* _init_sched(void *_)
     proc_t* p;
 
     while (1) {
-        if (!(p = pspop())) { DELAY(); continue; }
+        pthread_mutex_lock(&qmutex);
+        p = pspop();
+        pthread_mutex_unlock(&qmutex);
+        if (!p) {
+            DELAY();
+            continue;
+        }
 
-        fprintf(stdout, "\n[resume %s on pid %d]\n",
-                        p->name,
-                        p->pid);
+        // syslog(LOG_DEBUG,
+        //       "\n[resume %s on pid %d]\n", p->name, p->pid);
+
         pcont(p);
         DELAY();
         pstop(p);
