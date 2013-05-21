@@ -26,7 +26,10 @@ unsigned int  _t=10*1000;
 float         _a=1,
               _b=0;
 
-#define PRIORITY(p)      _a * expf(-_b*_t)
+static time_t TIME_ZERO;
+
+#define TIME             time(NULL) - TIME_ZERO
+#define PRIORITY(t)      _a * expf(-_b*t)
 #define DELAY()          usleep(_t);
 
 
@@ -83,7 +86,7 @@ void psinsert(proc_t* node)  {
     size_t i;
 
     pthread_mutex_lock(&qmutex);
-    node->priority = PRIORITY(node);
+    node->priority = PRIORITY(TIME);
     ps[psize++] = node;
 
     for (i = psize-1;
@@ -103,6 +106,8 @@ void psinsert(proc_t* node)  {
 void* _init_sched(void *_)
 {
     proc_t* p;
+
+    TIME_ZERO = time(NULL);
 
     while (1) {
         pthread_mutex_lock(&qmutex);

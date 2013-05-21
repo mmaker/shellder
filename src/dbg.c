@@ -53,7 +53,7 @@ int processes(int argc, char** argv)
            (unsigned int) psize);
 
     for (i = 0; i != psize; i++)
-        printf("%s, ", ps[i]->name);
+        printf("'%s', ", ps[i]->name);
     printf("\b\b    \n");
     return 0;
 }
