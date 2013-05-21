@@ -16,7 +16,7 @@ comando sulla shell standard: variabili d'ambiente come \texttt{\$PATH} avranno 
 con il vantaggio di poter eseguire i vari processi un background e di poterli gestire attraverso uno 
 \emph{scheduler spaziotemporale}.
 L'output di questi processi, insieme ai log della shell interattiva, vengono salvati all'interno di un file 
-\texttt{shellder.log}, se non diversamente indicato.
+\texttt{shellder.log}, se non diversamente indicato da command-line.
 
 \section{Albero delle directory}
 
@@ -39,6 +39,24 @@ dei costi, abbiamo optato per una struttura della forma linked tree piuttosto
 che un vettore statico, difatti costi di inserimento e rimozione risultano
 ordini di grandezza minori nel caso dell'albero linkato:
 
+\section{Valutazione delle Costanti}
+
+La scelta delle costanti dello scheduler pu\`o risultare intuitiva se si adnalizzano i casi limite: 
+\begin{itemize}
+\item $if \ \ \ b \rightarrow 0 , \forall a \ \ \ f(t) = a$. In questo caso si ha uno scheduler di tipo round-robin: a tutti i processi vengono infatti assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione.  
+\end{itemize}
 
 
+
+\section{Corner Cases e limiti applicativi}
+
+Attualmente l'applicazione soffre di tutta una serie di problemi di sicurezza, sia dettati dal tempo, sia dal design stesso dell'applicazione.
+\begin{itemize}
+\item gli input da command line non vegnono gestiti, specialmente nel caso in cui si desidera convertire una stringa in numero. Questo potrebbe comportare \emph{errori di segmentazione} al runtime, quando invece l'output
+ desiderato sarebbe la stampa delle opzioni disponibili  in combinazione con \texttt{EXIT\_FAILURE}.
+ 
+ \item i processi che vengono messi in coda, sono gestiti dallo scheduler mediante comunicazione \emph{IPC}, usando i segnali \texttt{SIGSTOP} e \texttt{SIGCONT}. Tuttavia, entrambi i segnali potrebbero essere sovrascritti da un'applicazione \,emph{malicious}, compromettendo completamente l'algoritmo di scheduling.  
+ 
+\item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \texttt{HEAPLEN} staticamente definito. Questo comporta un limite nel numero di processi potenzialmente gestibili in background. Possibili soluzioni sarebbero l'implementazione nel metodo \texttt{pinsert()} di una chiamata alla system-call \texttt{resize()} per una riallocazione dell'intera coda, mappandola su un vettore piu` grande.
+\end{itemize}  
 \end{document}
