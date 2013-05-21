@@ -34,11 +34,11 @@ char* shell_out_fname = "shellder.log";
 static void usage()
 {
     static const char* help =  "%s usage: %s "
-                               "[-l slogfile] "
+                               "[-l logfile ] "
                                "[-p prompt] "
                                "[-A a] "
                                "[-B b] "
-                               "[-T t] "
+                               "[-T microseconds] "
                                "\n";
     fprintf(stderr, help,
             program_invocation_short_name,
@@ -79,22 +79,21 @@ void process_cmd(char *line) {
     proc_t* p = pnew(line);
     pstop(p);
     psinsert(p);
-    printf("[%s on proc %d]\n", p->name, p->pid);
+//     printf("[%s on proc %d]\n", p->name, p->pid);
 }
 
 int main(int argc, char** argv)
 {
     char opt;
-    extern char* slogf;
     setlocale(LC_ALL, "");
 
-    while ((opt = getopt(argc, argv, "l:h:p:A:B:T")) != EOF)
+    while ((opt = getopt(argc, argv, "l:h:p:A:B:T:")) != EOF)
         switch (opt) {
             case 'h':
                 usage();
                 exit(EXIT_SUCCESS);
             case 'l':
-                slogf = optarg;
+                 shell_out_fname = optarg;
                 break;
             case 'p':
                 PS1 = optarg;
@@ -108,6 +107,7 @@ int main(int argc, char** argv)
             case 'T':
                 _t = atoi(optarg);
                 break;
+            case '?':
             default:
                 usage();
                 exit(EXIT_FAILURE);
