@@ -28,6 +28,6 @@ void strip(char** s, size_t* n);
  * TODO: to be implemented accordingly to double and single quotes, with escape
  * sequences etc.
  */
-char* split(char* s);
+size_t split(char* s, char*** argv, size_t* argc);
 
 #endif

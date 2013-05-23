@@ -17,6 +17,9 @@
 #include "process.h"
 #include "utils.h"
 
+/* please remove this shit. */
+#define MAX_WORDS 8
+
 extern int errno;
 
 static const int lenpn = 10;
@@ -24,7 +27,7 @@ static const int BUF = 256;
 
 FILE* shell_out;
 
-static pid_t popen2(const char* command, int* outfp)
+static pid_t popen2(char* command, char** args, int* outfp)
 {
     int poutfno[2];
     pid_t pid;
@@ -39,7 +42,7 @@ static pid_t popen2(const char* command, int* outfp)
         //close(poutfno[0]);
         dup2(poutfno[1], STDOUT_FILENO);
 
-        execl("/bin/sh", "sh", "-c", command, NULL);
+        execvp(command, args);
         EXIT_ERRNO();
     } else {
         close(poutfno[1]);
@@ -51,7 +54,7 @@ static pid_t popen2(const char* command, int* outfp)
     return 0;
 }
 
-proc_t* pnew(const char* cmd) {
+proc_t* pnew(char* cmd) {
     proc_t* p;
 
     p = malloc(sizeof(proc_t));
@@ -60,7 +63,10 @@ proc_t* pnew(const char* cmd) {
     p->name = strdup(cmd);
     if (!p->name) EXIT_ENOMEM();
 
-    p->pid = popen2(cmd, &p->outfno);
+    char** words = calloc(MAX_WORDS, sizeof(char*));
+    size_t count=0;
+    split(p->name, &words, &count);
+    p->pid = popen2(words[0], words, &p->outfno);
     return p;
 }
 

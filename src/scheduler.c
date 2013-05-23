@@ -29,8 +29,8 @@ float         _a=1,
 static time_t TIME_ZERO;
 
 #define TIME             time(NULL) - TIME_ZERO
-#define PRIORITY(t)      _a * expf(-_b*t)
-#define DELAY()          usleep(_t);
+#define PRIORITY(t)      _a * expl(-_b*t)
+#define DELAY()          sleep(_t);
 
 
 /*
@@ -100,14 +100,14 @@ void psinsert(proc_t* node)  {
 
 
 /*
- * -- SCHEDULER MANAGIN' UCNTION
+ * -- SCHEDULER FUNCTIONS
+ *  Proper functions for interacting with the scheduler.
+ *
  */
 
-void* _init_sched(void *_)
+static void* _init_sched(void *_)
 {
     proc_t* p;
-
-    TIME_ZERO = time(NULL);
 
     while (1) {
         pthread_mutex_lock(&qmutex);
@@ -134,8 +134,10 @@ void* _init_sched(void *_)
 
 void start_scheduler()
 {
+    TIME_ZERO = time(NULL);
+
     /* set up process queue */
-    ps = malloc(sizeof(proc_t*) * HEAPLEN);
+    ps = calloc(sizeof(proc_t*), HEAPLEN);
 
     /* set up attributes for thread. */
     pthread_attr_init(&schedta);

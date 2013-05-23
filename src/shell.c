@@ -24,7 +24,7 @@
 char* PS1 = ">>> ";
 int log_options = LOG_CONS | LOG_NOWAIT;
 
-char* shell_out_fname = "shellder.log";
+char* shell_out_fname = "/tmp/shellder.log";
 
 
 /**
@@ -56,9 +56,7 @@ void process_dbg(char *line) {
     char** argv = (char**) calloc(8, sizeof(char*));
     size_t argc;
 
-    argv[0] = strtok(line, " ");
-    for (argc=1; argc!=8; argc++)
-        if (!(argv[argc] = strtok(NULL, " "))) break;
+    split(line, &argv, &argc);
 
     for (it = dbgop; it->name; it++)
         if (!strcmp(line, it->name)) {

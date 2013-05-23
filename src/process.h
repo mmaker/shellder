@@ -16,7 +16,7 @@ extern FILE* shell_out;
 
 typedef struct proc_t {
     pid_t pid;                 /* pid associated with the child. 0 if unknown. */
-    float priority;          /* the priority of the current process. */
+    long double priority;          /* the priority of the current process. */
     char* name;              /* a human-readable string identifying the process. */
     int outfno;             /* file descriptor for the stdout of the child process. */
 } proc_t;
@@ -27,7 +27,7 @@ typedef struct proc_t {
  * \param cmd the command to be executed.
  * \return a new proc_t structure generated from `cmd`.
  */
-proc_t* pnew(const char* cmd);
+proc_t* pnew(char* cmd);
 
 /*
  *  \brief remove a process from the chain of active processes.
