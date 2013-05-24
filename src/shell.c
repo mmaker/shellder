@@ -76,7 +76,9 @@ quit:
 void process_cmd(char *line) {
     proc_t* p = pnew(line);
     pstop(p);
+    pthread_mutex_lock(&qmutex);
     psinsert(p);
+    pthread_mutex_unlock(&qmutex);
 //     printf("[%s on proc %d]\n", p->name, p->pid);
 }
 

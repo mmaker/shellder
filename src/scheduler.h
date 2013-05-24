@@ -25,5 +25,6 @@ void start_scheduler();
 void stop_scheduler();
 proc_t* pspop();
 void psinsert(proc_t* node);
+extern pthread_mutex_t qmutex;
 
 #endif

@@ -85,7 +85,6 @@ proc_t*  pspop()
 void psinsert(proc_t* node)  {
     size_t i;
 
-    pthread_mutex_lock(&qmutex);
     node->priority = PRIORITY(TIME);
     ps[psize++] = node;
 
@@ -93,8 +92,6 @@ void psinsert(proc_t* node)  {
          i > 0 && i < psize && ps[i]->priority > ps[PARENT(i)]->priority;
          i=PARENT(i))
         PSWAP(i, PARENT(i));
-
-    pthread_mutex_unlock(&qmutex);
 }
 
 
@@ -126,7 +123,11 @@ static void* _init_sched(void *_)
         pstop(p);
         plog(p);
         if (!palive(p)) pdel(p);
-        else            psinsert(p);
+        else {
+            pthread_mutex_lock(&qmutex);
+            psinsert(p);
+            pthread_mutex_unlock(&qmutex);
+        }
     }
     return NULL;
 }
