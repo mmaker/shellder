@@ -1,3 +1,5 @@
+#ifndef __SHELL_H__
+#define __SHELL_H__
 /**
  * \file shell.h
  * \brief View functions.
@@ -18,4 +20,4 @@ extern char* PS1;
  */
 void main_shellder();
 
-
+#endif

@@ -1,3 +1,5 @@
+#ifndef __DBG_H__
+#define __DBG_H__
 /**
  * \brief function "pd" (Print Deus) tests out funny stuff with unicode data.
  * \return always 42
@@ -14,14 +16,14 @@ int processes(int argc, char** argv);
 
 int set(int argc, char** argv);
 
-const struct dbgf_t  {
+int dbghelp(int argc, char** argv);
+
+struct dbgf_t  {
     const char* name;
     int (*funct) (int argc, char** argv);
-} dbgop[] = {
-    {.name="ps",  .funct=processes},
-    {.name="pd",  .funct=pd},
-    {.name="set", .funct=set},
-    {.name=NULL,  .funct=NULL},
+    const char* desc;
 };
 
+extern const struct dbgf_t dbgop[];
 
+#endif

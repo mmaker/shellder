@@ -5,6 +5,16 @@
 
 #include "process.h"
 #include "scheduler.h"
+#include "dbg.h"
+
+const struct dbgf_t dbgop[] = {
+    {.name="ps",    .funct=processes,    .desc="list current processes"},
+    {.name="pd",    .funct=pd,           .desc=""},
+    {.name="set",   .funct=set,          .desc="tune constraints"},
+    {.name="help",  .funct=dbghelp,      .desc="print help"},
+    {.name=NULL,    .funct=NULL,         .desc=NULL},
+};
+
 
 int pd(int argc, char** argv)
 {
@@ -57,3 +67,17 @@ int processes(int argc, char** argv)
     printf("\b\b    \n");
     return 0;
 }
+
+int dbghelp(int argc, char** argv)
+{
+    size_t i;
+
+    for(i=0; dbgop[i].name; i++)
+        printf("%%%s\t%s;\n", dbgop[i].name, dbgop[i].desc);
+    printf("\n");
+
+    return 0;
+}
+
+
+
