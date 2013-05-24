@@ -1,104 +1,163 @@
 \documentclass[11pt]{article}
 \usepackage{enumitem}
+\usepackage{hyperref}
 \title{\textbf{Sistemi Operativi 1}}
 \author{Michele Orr\`u}
 \date{}
 \begin{document}
 
-\maketitle
+\newcommand{\code}{\texttt}
 
-\abstract 
-Lo scopo di questo documento \`e quello di fornire un'inquadratura generale di come \`e stato organizzato il 
-codice, delle difficolt\`a e delle soluzioni algoritmiche adottate. Tutti i dettagli pi\`u strettamente 
-riguardanti l'implementazione sono descritti all'interno della documentazione automaticamente generata 
-tramite Doxygen.
+\maketitle
 
 \section{Introduzione}
 
 \textbf{Shellder} \`e una \emph{shell interattiva} con \emph{scheduling prioritario}.
-Ogni comando digitato dall'utente viene posto in una coda prioritaria ed eseguito in background nella shell di
-default \texttt{/bin/sh}. Questo vuol dire che ogni comando scritto sul \emph{Shellder} \`e equivalente ad un
-comando sulla shell standard: variabili d'ambiente come \texttt{\$PATH} avranno lo stesso significato;
-con il vantaggio di poter eseguire i vari processi un background e di poterli gestire attraverso uno 
-\emph{scheduler spaziotemporale}.
-L'output di questi processi, insieme ai log della shell interattiva, vengono salvati all'interno di un file 
-\texttt{shellder.log}, se non diversamente indicato da command-line.
+Ogni comando digitato dall'utente viene posto in una coda prioritaria ed
+eseguito in background, secondo delle particolari dinamiche di scheduling. Lo
+standard output di ogni processo, viene visualizzato all'interno di un apposito
+dile di log \code{/tmp/shellder.log},  se non diversamente indicato da
+\emph{command-line}.
 
-\section{Utilizzo del software} 
+Lo scopo d iquesto documento e` quello di fornire un'inquadratura generale di
+come \`e stato organizzato il codice, delle soluzioni algoritmiche trovate ai
+vari problemi, e di come il tutto \`stato integrato con le \emph{system-call}
+offerte dal sistema operativo. Tutti i dettagi implementativi sono stati
+delegati alla documentazione automaticamente generata con
+\href{http://www.stack.nl/~dimitri/doxygen/}{Doxygen}.
 
-Prima di cominciare, \`e necessario installare gli headers della libreria libreadline, nel caso di debian tramite:
-\\ \texttt{\$ sudo apt-get install libreadline-dev}
+\section{Utilizzo del software}
+\label{usage}
+
+Prima di cominciare, \`e necessario installare gli headers della libreria libreadline,
+nel caso della debian wheezy presa in considerazione questo e` possibile tramite:
+\\ \code{\$ sudo apt-get install libreadline-dev}
 
 \noindent Spostarsi all'interno della root del progetto, quindi compilare il codice con:
-\\ \texttt{\$ make}
+\\ \code{\$ make}
 
-\noindent \`E ora possibile eseguire il software: 
-\\ \texttt{\$ ./shellder -h}
+\noindent \`E ora possibile eseguire il software:
+\\ \code{\$ ./shellder -h}
 
-\noindent Verr\`a visualizzato l'help del programma, e listate le opzioni mediante le quali e` possibile modificare le costanti usate dallo schedule e cambiare la destinazione del file di log.
+\noindent Verr\`a visualizzato l'help del programma, e listate le opzioni mediante le quali e`
+possibile modificare le costanti usate dallo schedule e cambiare la destinazione del file di log.
 Alcuni esempi di come e` possibile usare la shell potrebbero essere:
-\\ \texttt{\$ ./shellder -T 10000 -B 0 -A 1 -l shellder.log}
-\\ \texttt{>>> ./examples/ping.py uno}
-\\ \texttt{>>> ./examples/ping.py due}
-\\ \texttt{>>> ./examples/ping.py tre}
-\\ \texttt{>>> ./examples/ping.py quattro}
- 
-\noindent Nella prima riga viene invocata la shell, successivamente vengono chiamati diversi comandi, i quali riempiono la coda di processi, attivano lo scheduler, e scrivono sullo standard output, il quale viene appositamente rediretto sul file di log.
-\\ \texttt{>>> \% ps}
+\\ \code{\$ ./shellder  -T 2  -B -0.1  -A 1  -l shellder.log}
+\\ \code{>>> ./examples/ping.py }
+\\ \code{>>> ./examples/ping.py }
+\\ \code{>>> ./examples/ping.py }
 
-\noindent Il seguente comando di debug mostrer\`a la lista dei processi attualmente in coda.
+\noindent Nella prima riga viene invocata la shell; viene quindi riempita la
+coda dei processi che gestisce lo scheduler.
+\\ \code{>>> \% ps}
+
+\noindent Il seguente \emph{comando di debug} mostrer\`a la lista dei processi
+attualmente in coda.
+\\ \code{>>>  \textasciicircum D}
+
+\noindent Premere \code{Ctrl-D} per uscire.
 
 \section{Albero delle directory}
 
-L'intero progetto pu\`o essere scaricato in qualsiasi momento da GitHub[0].
-\texttt{git clone https://github.com/mmaker/shellder.git}
+L'intero progetto presente in allegato e` stato sviluppatro tramite git ed
+\`pubblicamente accessibile su
+\href{https://bitbucket.org/maker/shellder/}{Bitbucket}
 
-La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto \texttt{C}: la root del sorgente si chiama \texttt{shellder/}, e all'interno di essa \`e possibile trovare i file \texttt{LICENSE}, \texttt{README}.
+La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto \code{C}:
+la root del sorgente si chiama \code{shellder/}, e all'interno di essa \`e possibile trovare i
+file \code{LICENSE}, \code{README}.
 
-All'interno della cartella \texttt{src/} si trovano i files: 
+Vi \`e infine la cartella \code{src/}, contentente il sorgente dell'applicazione:
 \begin{itemize}
-\item \texttt{shell.[ch]}, che ha il compito di gestire l'interazione con l'utente, la command line, e l'inserimento di nuovi processi nella coda dello scheduler;
-\item \texttt{process.[ch]} nella quale viene definito il tipo \texttt{proc\_t} e le funzioni per interagire con esso;
-\item \texttt{scheduler.[ch]}, nel quale viene definita la coda dei processi, le operazioni da effettuare su essa, e le funzioni di inizializzazione del thread dedicato allo scheduling;
-\item \texttt{utils.[ch]}, nel quale sono implementate diverse operazioni per la manipolazione di stringhe e/o di strutture interne;
-\item \texttt{dbg.[ch]} contiene tutte le funzioni di debug.
+\item \code{shell.[ch]}, che ha il compito di gestire l'interazione con l'utente, la command line,
+       e l'inserimento di nuovi processi nella coda dello scheduler;
+
+\item \code{process.[ch]} nella quale viene definito il tipo \texttt{proc\_t} e le funzioni
+       per interagire con esso;
+
+\item \code{scheduler.[ch]}, nel quale viene definita la coda dei processi, le operazioni da
+       effettuare su essa, e le funzioni di inizializzazione del thread dedicato allo scheduling;
+
+\item \code{utils.[ch]}, nel quale sono implementate diverse operazioni per la manipolazione di
+       stringhe e/o di strutture usate internamente al programma;
+
+\item \code{dbg.[ch]} contenente tutte le funzioni di debug.
 \end{itemize}
 
-Per maggiori informazioni, e` possibile consultare la documentazione automaticamente generata mediante Doxygen.
-
 \section{Scelte Implementative}
+
+\paragraph{Logging\\}
+Il file di log di default \`e stato settato di default a un path diverso da
+quello richiesto nella consegna semplicemente per esigenze di sviluppo: la
+scrittura dentro la directory \code{/var/log} avrebbe infatti disturbato il
+monitoraggio dei log di sistema, e perch\`e sui moderni computer dotati di
+\emph{SSD} \`e indicato montare la directory \code{/tmp} in RAM, risparmiando
+cicli di scrittura potenzialmente fastidiosi, specialmente in caso di bug.
+
+Per gli stessi motivi, l'iniziale scelta di adottare il log di sistema
+\code{syslog} \`e stata abbandonata - l'implementazione \`e ancora presente, ma
+commentata.
 
 \paragraph{Ordinamento dei Processi\\}
 L'algoritmo dedito allo scheduling segue palesemente una coda prioritaria;
 Pper esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
-parti, fuori dalla libreria standard, quanto piuttosto implementarne una nostra versione, facendo riferimento all'algoritmo proposto da \emph{Introduction to Algorithms, The MIT Press}. La sua implementazione \`e consultabile all'interno del file \texttt{scheduler.c}.
+parti, fuori dalla libreria standard, quanto piuttosto implementarne una nostra versione,
+facendo riferimento all'algoritmo proposto da \emph{Introduction to Algorithms, The MIT Press}.
+La sua implementazione \`e consultabile all'interno del file \code{scheduler.c}.
 
-\paragraph{Tool per il debugging\\}
-Al di l\`a dell'ausilio software esterni quali \texttt{gdb} e \texttt{valgrind}, all'interno della shell stessa \`e stato implementato un meccanismo per aiutare nel debugging e per il controllo della correttezza dello scheduler. Infatti, tutti i comandi il cui primo carattere \`e "\texttt{\%}" vengono processati al di fuori dalla coda dei processi, da delle funzioni interne alla shell. \`E possibile listare le funzioni di debug mediante il comando \texttt{\%help}.
+\paragraph{Tools per il debugging\\}
+Al di l\`a dell'ausilio software esterni quali \code{gdb} e \code{valgrind},
+all'interno della shell stessa \`e stato implementato un meccanismo per aiutare
+nel processo di debugging il controllo della correttezza dello scheduler.
+Infatti, tutti i comandi il cui primo carattere \`e "\code{\%}" vengono processati
+al di fuori dalla coda dei processi, da delle funzioni interne alla shell.
+\`E possibile listare le funzioni di debug mediante il comando \code{\%help}.
 
-Inoltre, per testare lo scheduler, sono disponibili alcuni eseguibili all'interno della cartella \texttt{examples/}: trattasi di piccoli script che interagiscono con lo standard output e che possono essere usati per valutare, dall'esterno, le performance dell'applicazione.
-
+Inoltre, per testare lo scheduler, sono disponibili alcuni eseguibili all'interno della
+cartella \code{examples/}: trattasi di piccoli script che interagiscono con lo standard
+output e che possono essere usati per valutare, dall'esterno, le performance dell'applicazione.
+Ad esempio, lo script \code{ping.py} mostrato in \nameref{usage} consta di un
+loop infinito che scrive a intervalli regolari il proprio pid.
 
 \section{Valutazione delle Costanti}
 
-La scelta delle costanti dello scheduler pu\`o risultare intuitiva se si adnalizzano i casi limite: 
+La valutazione delle costanti \`e un task La scelta delle costanti dello scheduler pu\`o risultare intuitiva se si adnalizzano i casi limite:
 \begin{itemize}
 \item $if \ \ \ b \rightarrow 0 , \forall a \ \ \ f(t) = a$. In questo caso si ha uno scheduler di tipo round-robin: a tutti i processi vengono infatti assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione.
 
-\item $if \ \ \ b = 0, a $   
+\item $if \ \ \ b = 0, a $
 \end{itemize}
 
 
 
 \section{Corner Cases e limiti applicativi}
 
-Attualmente l'applicazione soffre di tutta una serie di problemi di sicurezza, sia dettati dal tempo, sia dal design stesso dell'applicazione.
+Attualmente l'applicazione soffre di tutta una serie di problemi di sicurezza,
+sia dettati dal tempo, sia dal design stesso dell'applicazione. Di seguito sono
+riportati quelli pi\`u rilevanti, e le modalit\`a in cui potrebbero essere
+risolti.
+
 \begin{itemize}
-\item gli input da command line non vegnono gestiti, specialmente nel caso in cui si desidera convertire una stringa in numero. Questo potrebbe comportare \emph{errori di segmentazione} al runtime, quando invece l'output
- desiderato sarebbe la stampa delle opzioni disponibili  in combinazione con \texttt{EXIT\_FAILURE}.
- 
- \item i processi che vengono messi in coda, sono gestiti dallo scheduler mediante comunicazione \emph{IPC}, usando i segnali \texttt{SIGSTOP} e \texttt{SIGCONT}. Tuttavia, entrambi i segnali potrebbero essere sovrascritti da un'applicazione \,emph{malicious}, compromettendo completamente l'algoritmo di scheduling.  
- 
-\item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \texttt{HEAPLEN} staticamente definito. Questo comporta un limite nel numero di processi potenzialmente gestibili in background. Possibili soluzioni sarebbero l'implementazione nel metodo \texttt{pinsert()} di una chiamata alla system-call \texttt{resize()} per una riallocazione dell'intera coda, mappandola su un vettore piu` grande.
-\end{itemize}  
+\item gli input da command line non vegnono gestiti, specialmente nel caso in cui si desidera convertire una stringa in numero.
+      Questo potrebbe comportare \emph{errori di segmentazione} al runtime, quando invece l'output desiderato sarebbe la stampa
+      delle opzioni disponibili  in combinazione con \texttt{EXIT\_FAILURE}.
+
+\item i processi che vengono messi in coda, sono gestiti dallo scheduler mediante
+      comunicazione \emph{IPC}, usando i segnali
+      \code{SIGSTOP} e \code{SIGCONT}. Tuttavia, lo standard posix non
+      implementa la system call \code{kill} per gruppi di processi. Questo vuol
+      dire che un potenziale programma che fa uso della \code{fork()} potrebbe
+      compromettere completamente l'algoritmo di scheduling;
+
+\item la shell pi\`u usata in ambito unix, \code{bash}, e` strutturata di modo
+      che il segnale \code{SIGINT} viene inoltrato a tutti i processi figli.
+      Questo implica che se viene premuto \code{Ctrl-C} il segnale verra` ricevuto
+      anche dai processi figli;
+
+\item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
+      staticamente definito. Questo comporta un limite nel numero di processi potenzialmente
+      gestibili in background. Possibili soluzioni sarebbero l'implementazione nel metodo
+      \code{pinsert()} di una chiamata alla system-call \code{resize()} per una riallocazione
+      dell'intera coda, mappandola su un vettore piu` grande.
+\end{itemize}
 \end{document}

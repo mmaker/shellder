@@ -14,9 +14,19 @@ int pd(int argc, char** argv);
  */
 int processes(int argc, char** argv);
 
+/**
+ * \brief function "set" permits to tune scheduler constraints at run time.
+ *
+ */
 int set(int argc, char** argv);
 
+
+/**
+ * /brief function "help" (DeBuG HELP) prints out the available commands to be
+ * used for monitoring the shell.
+ */
 int dbghelp(int argc, char** argv);
+
 
 struct dbgf_t  {
     const char* name;
