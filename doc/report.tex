@@ -15,7 +15,7 @@
 \textbf{Shellder} \`e una \emph{shell interattiva} con \emph{scheduling prioritario}.
 Ogni comando digitato dall'utente viene posto in una coda prioritaria ed
 eseguito in background, secondo delle particolari dinamiche di scheduling. Lo
-standard output di ogni processo, viene visualizzato all'interno di un apposito
+standard output di ogni processo viene visualizzato all'interno di un apposito
 dile di log \code{/tmp/shellder.log},  se non diversamente indicato da
 \emph{command-line}.
 
@@ -72,8 +72,8 @@ Vi \`e infine la cartella \code{src/}, contentente il sorgente dell'applicazione
 \item \code{shell.[ch]}, che ha il compito di gestire l'interazione con l'utente, la command line,
        e l'inserimento di nuovi processi nella coda dello scheduler;
 
-\item \code{process.[ch]} nella quale viene definito il tipo \texttt{proc\_t} e le funzioni
-       per interagire con esso;
+\item \code{process.[ch]} nella quale viene definito il tipo \texttt{proc\_t}, utilizzato per memorizzare
+	   tutte le informazioni utili di un processo in esecuzione, e le funzioni per interagire con esso;
 
 \item \code{scheduler.[ch]}, nel quale viene definita la coda dei processi, le operazioni da
        effettuare su essa, e le funzioni di inizializzazione del thread dedicato allo scheduling;
@@ -92,7 +92,7 @@ quello richiesto nella consegna semplicemente per esigenze di sviluppo: la
 scrittura dentro la directory \code{/var/log} avrebbe infatti disturbato il
 monitoraggio dei log di sistema, e perch\`e sui moderni computer dotati di
 \emph{SSD} \`e indicato montare la directory \code{/tmp} in RAM, risparmiando
-cicli di scrittura potenzialmente fastidiosi, specialmente in caso di bug.
+cicli di scrittura potenzialmente erosivi, specialmente in caso di bug.
 
 Per gli stessi motivi, l'iniziale scelta di adottare il log di sistema
 \code{syslog} \`e stata abbandonata - l'implementazione \`e ancora presente, ma
@@ -100,7 +100,7 @@ commentata.
 
 \paragraph{Ordinamento dei Processi\\}
 L'algoritmo dedito allo scheduling segue palesemente una coda prioritaria;
-Pper esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
+Per esigenze didattiche abbiamo deciso di non appoggiarci a progetti di terze
 parti, fuori dalla libreria standard, quanto piuttosto implementarne una nostra versione,
 facendo riferimento all'algoritmo proposto da \emph{Introduction to Algorithms, The MIT Press}.
 La sua implementazione \`e consultabile all'interno del file \code{scheduler.c}.
@@ -121,13 +121,38 @@ loop infinito che scrive a intervalli regolari il proprio pid.
 
 \section{Valutazione delle Costanti}
 
-La valutazione delle costanti \`e un task La scelta delle costanti dello scheduler pu\`o risultare intuitiva se si adnalizzano i casi limite:
+La priorit\`a di un processo viene valutata da una funzione riportata nella consegna:
+$$
+P(t) = f(t) = a \cdot e^{-bt}
+$$
+Dove la variabile $t$, non essendo stato esplicitamente indicato, e` il tempo totale
+ trascorso dall'esecuzione della shell.
+
+Le costanti $a$ e $b$  invece possono essere determinate dell'utente per gestire la 
+modalita` secondo cui effettuare lo scheduling. Analizziamo di seguito come la funzione
+$f(t)$ degenera per valori particolari di queste:
 \begin{itemize}
-\item $if \ \ \ b \rightarrow 0 , \forall a \ \ \ f(t) = a$. In questo caso si ha uno scheduler di tipo round-robin: a tutti i processi vengono infatti assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione.
+\item Per valori di $b$ che tendono a $0$ l'algoritmo degenera in un \emph{round-robin}, ossia ai processi vengono assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione:
+$$
+\forall \ a \quad \lim_{b \to 0^+}{f(t)} = a 
+$$
 
-\item $if \ \ \ b = 0, a $
+\item $if\ b\ != 0$, $a$ \`e trascurabile, in quanto fattore moltiplicativo; tuttavia, per valori
+molto grandi di $a$, si potrebbero avere casi di \emph{integer overflow}, se l'informazione
+necessaria per rappresentare $f(t) > $ \code{sizeof(long double)};
+
+\item per tutti gli altri casi, la variabile $t$ gioca un riolo fondamentale: \emph{decrementa} la priorit\`a
+     del processo finch\`e questo non converge a $0$:
+$$
+\lim_{t \to +\infty}f(t) = a \cdot e^{-bt} = a \cdot e^{-t} = \frac{a}{e^{-t}} = 0
+$$   
+
+Da un punto di vista puramente pratico, \`e possibile apprezzare bene questo fenomeno per valori
+$a \in [] \quad b \in []$.
+Ad esempio
+\\ \code{>>> \%set }
+
 \end{itemize}
-
 
 
 \section{Corner Cases e limiti applicativi}
@@ -156,8 +181,8 @@ risolti.
 
 \item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
       staticamente definito. Questo comporta un limite nel numero di processi potenzialmente
-      gestibili in background. Possibili soluzioni sarebbero l'implementazione nel metodo
-      \code{pinsert()} di una chiamata alla system-call \code{resize()} per una riallocazione
+      gestibili in background. Possibili soluzioni sarebbero l'implementazione di una chiamata alla 
+      system-call \code{resize()} nel metodo \code{pinsert()} per una riallocazione
       dell'intera coda, mappandola su un vettore piu` grande.
 \end{itemize}
 \end{document}
