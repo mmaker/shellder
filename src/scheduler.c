@@ -22,7 +22,7 @@ size_t psize = 0;
 static int HEAPLEN = 10;
 pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
 
-unsigned int  _t=10*1000;
+unsigned int  _t=1;
 float         _a=1,
               _b=0;
 
