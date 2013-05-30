@@ -100,10 +100,10 @@ int main(int argc, char** argv)
                 PS1 = optarg;
                 break;
             case 'A':
-                _a = atof(optarg);
+                _a = strtold(optarg, NULL);
                 break;
             case 'B':
-                _b = atof(optarg);
+                _b = strtold(optarg, NULL);
                 break;
             case 'T':
                 _t = atoi(optarg);

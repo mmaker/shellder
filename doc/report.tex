@@ -1,6 +1,8 @@
 \documentclass[11pt]{article}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage{amsmath}
+
 \title{\textbf{Sistemi Operativi 1}}
 \author{Michele Orr\`u}
 \date{}
@@ -132,10 +134,11 @@ Le costanti $a$ e $b$  invece possono essere determinate dell'utente per gestire
 modalita` secondo cui effettuare lo scheduling. Analizziamo di seguito come la funzione
 $f(t)$ degenera per valori particolari di queste:
 \begin{itemize}
-\item Per valori di $b$ che tendono a $0$ l'algoritmo degenera in un \emph{round-robin}, ossia ai processi vengono assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione:
-$$
-\forall \ a \quad \lim_{b \to 0^+}{f(t)} = a
-$$
+\item per valori di $b$ positivi l'algoritmo degenera in un \emph{round-robin}, ossia ai processi vengono assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione:
+\begin{gather}
+t, t'\ |\ t > t'
+\\\forall \ a \quad \lim_{b \to 0^+}{f(t)} = a
+\end{gather}
 
 \item $if\ b\ != 0$, $a$ \`e trascurabile, in quanto fattore moltiplicativo; tuttavia, per valori
 molto grandi di $a$, si potrebbero avere casi di \emph{integer overflow}, se l'informazione
