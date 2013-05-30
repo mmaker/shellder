@@ -64,7 +64,8 @@ void process_dbg(char *line) {
              if (ret) fprintf(stderr, "!%d\n", ret);
              goto quit;
         }
-    fprintf(stderr, "shellder: command not found.\n");
+    fprintf(stderr, "%s: command not found.\n",
+            program_invocation_short_name);
 quit:
     free(argv);
     return;

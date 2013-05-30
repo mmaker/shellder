@@ -43,7 +43,7 @@ static pid_t popen2(char* command, char** args, int* outfp)
         dup2(poutfno[1], STDOUT_FILENO);
 
         execvp(command, args);
-        EXIT_ERRNO();
+        exit(EXIT_FAILURE);
     } else {
         close(poutfno[1]);
         if (!outfp) close(poutfno[0]);
@@ -67,6 +67,12 @@ proc_t* pnew(char* cmd) {
     size_t count=0;
     split(p->name, &words, &count);
     p->pid = popen2(words[0], words, &p->outfno);
+
+    if (!p->pid) {
+        pdel(p);
+        p = NULL;
+    }
+
     return p;
 }
 
