@@ -24,7 +24,7 @@ pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
 
 unsigned long int   _t=1;
 long double         _a=1,
-                    _b=0;
+                    _b=1;
 
 static time_t TIME_ZERO;
 
