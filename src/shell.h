@@ -1,10 +1,18 @@
+/**
+ * \mainpage Welcome to the shellder documentation!
+ *
+ * Here you can find all specific informations about the shell, how each
+ * internal structure is defined, and in which way which functions interacts
+ * with them.
+ */
+
 #ifndef __SHELL_H__
 #define __SHELL_H__
 /**
  * \file shell.h
  * \brief View functions.
  *
- * This file exports the main functions used to nteract with the user.
+ * \detail This file exports the main functions used to nteract with the user.
  */
 
 
