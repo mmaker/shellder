@@ -1,8 +1,10 @@
 \documentclass[11pt]{article}
 \usepackage{enumitem}
 \usepackage{hyperref}
+\usepackage{amsmath}
+
 \title{\textbf{Sistemi Operativi 1}}
-\author{Michele Orr\`u, Matteo Lever, Giulio Michelon}
+\author{Michele Orr\`u \and Matteo Lever \and Giulio Michelon}
 \date{}
 \begin{document}
 
@@ -117,7 +119,7 @@ Inoltre, per testare lo scheduler, sono disponibili alcuni eseguibili all'intern
 cartella \code{examples/}: trattasi di piccoli script che interagiscono con lo standard
 output e che possono essere usati per valutare, dall'esterno, le performance dell'applicazione.
 Ad esempio, lo script \code{ping.py} mostrato in \nameref{usage} consta di un
-loop infinito che scrive a intervalli regolari il proprio pid.
+loop infinito che scrive a intervalli regolari di $1\sec$ il proprio pid.
 
 \section{Valutazione delle Costanti}
 
@@ -125,34 +127,82 @@ La priorit\`a di un processo viene valutata da una funzione riportata nella cons
 $$
 P(t) = f(t) = a \cdot e^{-bt}
 $$
-Dove la variabile $t$, non essendo stato esplicitamente indicato, e` il tempo totale
+Dove la variabile $t$, non essendo stato esplicitamente indicato, \`e stato fissato al tempo totale
  trascorso dall'esecuzione della shell.
 
-Le costanti $a$ e $b$  invece possono essere determinate dell'utente per gestire la 
-modalita` secondo cui effettuare lo scheduling. Analizziamo di seguito come la funzione
+Le costanti $a$ e $b$  invece possono essere determinate dell'utente per gestire la
+modalita` secondo cui effettuare lo scheduling. In particolare, $a$ \`e del tutto irrilevante
+in quanto indipendente dal tempo.
+Infatti, 
+\begin{align}
+\begin{split}
+ \forall t_1, t_2\ s.t.\ |f(t_1)| \le |f(t_2)| \quad \frac{|a|}{e^{bt_1}} \le \frac{|a|}{e^{bt_2}} \\
+  \frac{1}{e^{bt_1}} \le \frac{1}{e^{bt_2}}\\
+\end{split}
+\end{align}
+Il caso in cui $|f(t_1)| \ge |f(t_2)| $ \`e simmetrico, basta scambiare $t_1$ con $t_2$. Stesso vale per
+$a \le 0$:
+\begin{align}
+\begin{split}
+ if\ a \le 0, -|f(t_1)| \le -|f(t_2)| \\
+ 			   |f(t_1)|\ \ge\ |f(t_2)|
+\end{split}
+\end{align}
+
+Analizziamo di seguito come la funzione
 $f(t)$ degenera per valori particolari di queste:
 \begin{itemize}
-\item Per valori di $b$ che tendono a $0$ l'algoritmo degenera in un \emph{round-robin}, ossia ai processi vengono assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione:
+\item per valori di $b$ positivi l'algoritmo \`e paragonabile a un \emph{round-robin}, dove ai processi
+ vengono assegnati eguali \emph{time-slices}, senza alcuna forma di prioritizzazione. Ogni progetto estratto
+viene messo in coda, finch\`e la priorit\`a non degenera a $0$ per tutti:
 $$
-\forall \ a \quad \lim_{b \to 0^+}{f(t)} = a 
+\forall t, t'\mid t \le t', \quad \forall b \ge 0,\quad \forall a, 
+\quad f(t) \le f(t')
 $$
 
-\item $if\ b\ != 0$, $a$ \`e trascurabile, in quanto fattore moltiplicativo; tuttavia, per valori
-molto grandi di $a$, si potrebbero avere casi di \emph{integer overflow}, se l'informazione
-necessaria per rappresentare $f(t) > $ \code{sizeof(long double)};
-
-\item per tutti gli altri casi, la variabile $t$ gioca un riolo fondamentale: \emph{decrementa} la priorit\`a
-     del processo finch\`e questo non converge a $0$:
+\item per valori positivi di $b$ l'algoritmo assegna la massima priorit\`a all'ultimo processo chiamato.
+Infatti:
 $$
-\lim_{t \to +\infty}f(t) = a \cdot e^{-bt} = a \cdot e^{-t} = \frac{a}{e^{-t}} = 0
-$$   
-
-Da un punto di vista puramente pratico, \`e possibile apprezzare bene questo fenomeno per valori
-$a \in [] \quad b \in []$.
-Ad esempio
-\\ \code{>>> \%set }
-
+\forall t, t'\mid t \ge t', \quad \forall b \ge 0,\quad \forall a, 
+\quad f(t) \ge f(t')
+$$
+\`E da notare tuttavia, che per valori molto grandi di $a$ (e/o molto piccoli di b),
+ si potrebbero avere casi di \emph{integer overflow}, nel caso in cui l'informazione
+necessaria per rappresentare $f(t)$ fosse maggiore di \code{sizeof(long double)}.
 \end{itemize}
+Vengono riportati di seguito alcuni esempi di quanto provato sopra. Per il caso di $b \le 0$
+\\\code{\$ ./shellder -A1 -B-1 -T 1 \&\& cat /tmp/shellder.log }
+\\\code{>>> ./examples/ping.py }
+\\\code{>>> ./examples/ping.py }
+\\\code{>>> ./examples/ping.py }
+\\ \code{>>>  \textasciicircum D}
+\\\code{ping 26348}
+\\\code{ping 26349}
+\\\code{ping 26350}
+\\\code{ping 26350}
+\\\code{ping 26350}
+\\\code{ping 26350}
+\\
+\\Per il caso di $b \ge 0$:
+\\\code{\$ ./shellder -A1 -B1 -T 1 \&\& cat /tmp/shellder.log }
+\\\code{>>> ./examples/ping.py }
+\\\code{>>> ./examples/ping.py }
+\\\code{>>> ./examples/ping.py }
+\\ \code{>>>  \textasciicircum D}
+\\\code{ping 26894}
+\\\code{ping 26894}
+\\\code{ping 26895}
+\\\code{ping 26894}
+\\\code{ping 26900}
+\\\code{ping 26895}
+\\\code{ping 26894}
+\\\code{ping 26900}
+\\\code{ping 26895}
+\\\code{ping 26894}
+\\\code{ping 26900}
+\\\code{ping 26895}
+\\\code{ping 26894}
+\\\code{ping 26900}
 
 
 \section{Corner Cases e limiti applicativi}
@@ -181,7 +231,7 @@ risolti.
 
 \item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
       staticamente definito. Questo comporta un limite nel numero di processi potenzialmente
-      gestibili in background. Possibili soluzioni sarebbero l'implementazione di una chiamata alla 
+      gestibili in background. Possibili soluzioni sarebbero l'implementazione di una chiamata alla
       system-call \code{resize()} nel metodo \code{pinsert()} per una riallocazione
       dell'intera coda, mappandola su un vettore piu` grande.
 \end{itemize}
