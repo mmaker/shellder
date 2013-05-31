@@ -64,7 +64,8 @@ void process_dbg(char *line) {
              if (ret) fprintf(stderr, "!%d\n", ret);
              goto quit;
         }
-    fprintf(stderr, "shellder: command not found.\n");
+    fprintf(stderr, "%s: command not found.\n",
+            program_invocation_short_name);
 quit:
     free(argv);
     return;
@@ -99,10 +100,10 @@ int main(int argc, char** argv)
                 PS1 = optarg;
                 break;
             case 'A':
-                _a = atof(optarg);
+                _a = strtold(optarg, NULL);
                 break;
             case 'B':
-                _b = atof(optarg);
+                _b = strtold(optarg, NULL);
                 break;
             case 'T':
                 _t = atoi(optarg);

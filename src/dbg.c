@@ -36,7 +36,10 @@ int pd(int argc, char** argv)
 
 int set(int argc, char** argv)
 {
-    if (argc != 3) return 1;
+    if (argc == 1) {
+        printf("A=%Lf; B=%Lf; t=%u\n", _a, _b, _t);
+        return 0;
+    } else if (argc != 3) return 1;
 
     if (!strcmp(argv[1], "a"))
         _a = atof(argv[2]);

@@ -22,14 +22,12 @@ size_t psize = 0;
 static int HEAPLEN = 10;
 pthread_mutex_t qmutex = PTHREAD_MUTEX_INITIALIZER;
 
-unsigned int  _t=1;
-float         _a=1,
-              _b=1;
+unsigned long int   _t=1;
+long double         _a=1,
+                    _b=0;
 
 static time_t TIME_ZERO;
 
-#define TIME             time(NULL) - TIME_ZERO
-#define PRIORITY(t)      _a * expl(-_b*t)
 #define DELAY()          sleep(_t);
 
 
@@ -69,7 +67,10 @@ static void heapify(int i)
     }
 }
 
-
+static long double priority(unsigned int t)
+{
+    return _a * expl(-_b * t);
+}
 
 proc_t*  pspop()
 {
@@ -85,7 +86,8 @@ proc_t*  pspop()
 void psinsert(proc_t* node)  {
     size_t i;
 
-    node->priority = PRIORITY(TIME);
+    node->priority = priority(time(NULL) - TIME_ZERO);
+    //fprintf(stderr, "%d %Lf\n", node->pid, node->priority);
     ps[psize++] = node;
 
     for (i = psize-1;

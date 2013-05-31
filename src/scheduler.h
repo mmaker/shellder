@@ -14,8 +14,8 @@ extern proc_t** ps;
 extern size_t psize;
 extern pthread_mutex_t qmutex;
 
-extern unsigned int _t;
-extern float _a, _b;
+extern unsigned long int _t;
+extern long double _a, _b;
 
 
 /**
