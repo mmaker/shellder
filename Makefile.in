@@ -1,7 +1,0 @@
-CC=gcc
-RANLIB=ranlib
-CFLAGS:=$(CFLAGS) -c -ansi -std=c99 -Wall -fstack-protector -ggdb
-LIBS=-lreadline -lpthread -lm
-
-OBJS=shell.o utils.o process.o dbg.o scheduler.o
-EXE=shellder
