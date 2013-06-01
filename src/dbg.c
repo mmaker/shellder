@@ -37,7 +37,7 @@ int pd(int argc, char** argv)
 int set(int argc, char** argv)
 {
     if (argc == 1) {
-        printf("A=%Lf; B=%Lf; t=%u\n", _a, _b, _t);
+        printf("A=%Lf; B=%Lf; t=%lu\n", _a, _b, _t);
         return 0;
     } else if (argc != 3) return 1;
 

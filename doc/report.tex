@@ -228,7 +228,7 @@ risolti.
       Questo implica che se viene premuto \code{Ctrl-C} il segnale verra` ricevuto
       anche dai processi figli;
 
-\item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
+\item l'intera coda dei processi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
       staticamente definito. Questo comporta un limite nel numero di processi potenzialmente
       gestibili in background. Possibili soluzioni sarebbero l'implementazione di una chiamata alla
       system-call \code{resize()} nel metodo \code{pinsert()} per una riallocazione
