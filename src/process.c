@@ -39,7 +39,7 @@ static pid_t popen2(char* command, char** args, int* outfp)
     if (pid < 0) {
         EXIT_ERRNO();
     } else if (pid == 0) {
-        //close(poutfno[0]);
+        /*close(poutfno[0]); */
         dup2(poutfno[1], STDOUT_FILENO);
 
         execvp(command, args);
@@ -86,14 +86,14 @@ void pdel(proc_t* p)
 
 void pstop(proc_t* p)
 {
-    // syslog(LOG_NOTICE, "'%s' STOP %d ", p->name, time(NULL));
+    /* syslog(LOG_NOTICE, "'%s' STOP %d ", p->name, time(NULL)); */
     if (kill(p->pid, SIGSTOP) != 0)
         error_at_line(1, errno, __FILE__, __LINE__, NULL);
 }
 
 void pcont(proc_t* p)
 {
-    // syslog(LOG_NOTICE, "'%s' CONT %d", p->name, time(NULL));
+    /* syslog(LOG_NOTICE, "'%s' CONT %d", p->name, time(NULL)); */
     if (kill(p->pid, SIGCONT) != 0)
         error_at_line(1, errno, __FILE__, __LINE__, NULL);
 

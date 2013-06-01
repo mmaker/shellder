@@ -80,7 +80,7 @@ void process_cmd(char *line) {
     pthread_mutex_lock(&qmutex);
     psinsert(p);
     pthread_mutex_unlock(&qmutex);
-//     printf("[%s on proc %d]\n", p->name, p->pid);
+/*    printf("[%s on proc %d]\n", p->name, p->pid); */
 }
 
 int main(int argc, char** argv)

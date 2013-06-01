@@ -87,7 +87,7 @@ void psinsert(proc_t* node)  {
     size_t i;
 
     node->priority = priority(time(NULL) - TIME_ZERO);
-    //fprintf(stderr, "%d %Lf\n", node->pid, node->priority);
+    /*fprintf(stderr, "%d %Lf\n", node->pid, node->priority); */
     ps[psize++] = node;
 
     for (i = psize-1;
@@ -117,8 +117,8 @@ static void* _init_sched(void *_)
             continue;
         }
 
-        // syslog(LOG_DEBUG,
-        //       "\n[resume %s on pid %d]\n", p->name, p->pid);
+        /* syslog(LOG_DEBUG,
+                 "\n[resume %s on pid %d]\n", p->name, p->pid); */
 
         pcont(p);
         DELAY();
