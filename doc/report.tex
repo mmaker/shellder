@@ -18,12 +18,12 @@
 Ogni comando digitato dall'utente viene posto in una coda prioritaria ed
 eseguito in background, secondo delle particolari dinamiche di scheduling. Lo
 standard output di ogni processo viene visualizzato all'interno di un apposito
-dile di log \code{/tmp/shellder.log},  se non diversamente indicato da
+file di log \code{/tmp/shellder.log}, se non diversamente indicato da
 \emph{command-line}.
 
-Lo scopo d iquesto documento e` quello di fornire un'inquadratura generale di
+Lo scopo di questo documento \`e quello di fornire un'inquadratura generale di
 come \`e stato organizzato il codice, delle soluzioni algoritmiche trovate ai
-vari problemi, e di come il tutto \`stato integrato con le \emph{system-call}
+vari problemi, e di come il tutto \`e stato integrato con le \emph{system-call}
 offerte dal sistema operativo. Tutti i dettagi implementativi sono stati
 delegati alla documentazione automaticamente generata con
 \href{http://www.stack.nl/~dimitri/doxygen/}{Doxygen}.
@@ -32,7 +32,7 @@ delegati alla documentazione automaticamente generata con
 \label{usage}
 
 Prima di cominciare, \`e necessario installare gli headers della libreria libreadline,
-nel caso della debian wheezy presa in considerazione questo e` possibile tramite:
+nel caso della debian wheezy presa in considerazione questo \'e possibile tramite:
 \\ \code{\$ sudo apt-get install libreadline-dev}
 
 \noindent Spostarsi all'interno della root del progetto, quindi compilare il codice con:
@@ -41,9 +41,9 @@ nel caso della debian wheezy presa in considerazione questo e` possibile tramite
 \noindent \`E ora possibile eseguire il software:
 \\ \code{\$ ./shellder -h}
 
-\noindent Verr\`a visualizzato l'help del programma, e listate le opzioni mediante le quali e`
+\noindent Verr\`a visualizzato l'help del programma, e listate le opzioni mediante le quali \'e
 possibile modificare le costanti usate dallo schedule e cambiare la destinazione del file di log.
-Alcuni esempi di come e` possibile usare la shell potrebbero essere:
+Alcuni esempi di come \'e possibile usare la shell potrebbero essere:
 \\ \code{\$ ./shellder  -T 2  -B -0.1  -A 1  -l shellder.log}
 \\ \code{>>> ./examples/ping.py }
 \\ \code{>>> ./examples/ping.py }
@@ -61,11 +61,11 @@ attualmente in coda.
 
 \section{Albero delle directory}
 
-L'intero progetto presente in allegato e` stato sviluppatro tramite git ed
-\`pubblicamente accessibile su
+L'intero progetto presente in allegato \'e stato sviluppatro tramite git ed
+\`e pubblicamente accessibile su
 \href{https://bitbucket.org/maker/shellder/}{Bitbucket}
 
-La struttura del filesystem segue pressoche` quella di un qualsiasi altro progetto \code{C}:
+La struttura del filesystem segue pressoch\'e quella di un qualsiasi altro progetto \code{C}:
 la root del sorgente si chiama \code{shellder/}, e all'interno di essa \`e possibile trovare i
 file \code{LICENSE}, \code{README}.
 
@@ -131,7 +131,7 @@ Dove la variabile $t$, non essendo stato esplicitamente indicato, \`e stato fiss
  trascorso dall'esecuzione della shell.
 
 Le costanti $a$ e $b$  invece possono essere determinate dell'utente per gestire la
-modalita` secondo cui effettuare lo scheduling. In particolare, $a$ \`e del tutto irrilevante
+modalit\'a secondo cui effettuare lo scheduling. In particolare, $a$ \`e del tutto irrilevante
 in quanto indipendente dal tempo.
 Infatti,
 \begin{align}
@@ -212,26 +212,26 @@ riportati quelli pi\`u rilevanti, e le modalit\`a in cui potrebbero essere
 risolti.
 
 \begin{itemize}
-\item gli input da command line non vegnono gestiti, specialmente nel caso in cui si desidera convertire una stringa in numero.
+\item gli input da command line non vengono gestiti, specialmente nel caso in cui si desidera convertire una stringa in numero.
       Questo potrebbe comportare \emph{errori di segmentazione} al runtime, quando invece l'output desiderato sarebbe la stampa
       delle opzioni disponibili  in combinazione con \texttt{EXIT\_FAILURE}.
 
-\item i processi che vengono messi in coda, sono gestiti dallo scheduler mediante
+\item i processi che vengono messi in coda sono gestiti dallo scheduler mediante
       comunicazione \emph{IPC}, usando i segnali
       \code{SIGSTOP} e \code{SIGCONT}. Tuttavia, lo standard posix non
       implementa la system call \code{kill} per gruppi di processi. Questo vuol
       dire che un potenziale programma che fa uso della \code{fork()} potrebbe
       compromettere completamente l'algoritmo di scheduling;
 
-\item la shell pi\`u usata in ambito unix, \code{bash}, e` strutturata di modo
+\item la shell pi\`u usata in ambito unix, \code{bash}, \'e strutturata di modo
       che il segnale \code{SIGINT} viene inoltrato a tutti i processi figli.
-      Questo implica che se viene premuto \code{Ctrl-C} il segnale verra` ricevuto
+      Questo implica che se viene premuto \code{Ctrl-C} il segnale verr\'a ricevuto
       anche dai processi figli;
 
-\item l'intera coda dei prcessi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
+\item l'intera coda dei processi viene gestita tramite un vettore di grandezza \code{HEAPLEN}
       staticamente definito. Questo comporta un limite nel numero di processi potenzialmente
       gestibili in background. Possibili soluzioni sarebbero l'implementazione di una chiamata alla
       system-call \code{resize()} nel metodo \code{pinsert()} per una riallocazione
-      dell'intera coda, mappandola su un vettore piu` grande.
+      dell'intera coda, mappandola su un vettore pi\'u grande.
 \end{itemize}
 \end{document}
