@@ -34,7 +34,7 @@ static time_t TIME_ZERO;
 /*
  * -- HEAP FUNCTIONS
  * Scheduler performes partial sorting of the processes queue using a binary
- * heap, and the function impolemented below, following MIT's Introduction to
+ * heap, and the function implemented below, following MIT's Introduction to
  * Algorithms. Wondering why standard c does not provide any macro for that.
  */
 

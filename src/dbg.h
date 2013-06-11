@@ -29,7 +29,7 @@ int pd(int argc, char** argv);
 int processes(int argc, char** argv);
 
 /**
- * \brief chage scheduler constraints.
+ * \brief change scheduler constraints.
  * \return 0 in case of success, 1 otherwise
  *
  * \detail function "set" permits to tune scheduler constraints at run time.
